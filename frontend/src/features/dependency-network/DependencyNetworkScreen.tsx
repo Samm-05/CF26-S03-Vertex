@@ -30,7 +30,7 @@ interface DependencyNetworkScreenProps {
 export const DependencyNetworkScreen: React.FC<DependencyNetworkScreenProps> = ({
   selectedNodeId,
   onSelectNode,
-  onSimulateFailure: _onGlobalSimulate,
+  onSimulateFailure,
   onNavigateToResults,
   simulatedStatuses = {}
 }) => {
@@ -75,7 +75,11 @@ export const DependencyNetworkScreen: React.FC<DependencyNetworkScreenProps> = (
   };
 
   const handleStartFailureSimulation = (nodeId: string) => {
-    startPropagation(nodeId);
+    if (onSimulateFailure) {
+      onSimulateFailure(nodeId);
+    } else {
+      startPropagation(nodeId);
+    }
   };
 
   return (
@@ -165,7 +169,7 @@ export const DependencyNetworkScreen: React.FC<DependencyNetworkScreenProps> = (
               nodes={nodes}
               edges={NETWORK_EDGES}
               selectedNodeId={selectedNodeId}
-              onSelectNode={(id) => onSelectNode(id)}
+              onSelectNode={handleNodeClick}
               highlightMode={highlightMode}
               cascadeActiveNodeIds={activeCascadeNodeIds}
             />

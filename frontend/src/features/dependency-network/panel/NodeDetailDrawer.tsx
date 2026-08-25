@@ -46,6 +46,16 @@ export const NodeDetailDrawer: React.FC<NodeDetailDrawerProps> = ({
   onSimulateFailure,
   onViewDependencies
 }) => {
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!node) return null;
 
   const Icon = CATEGORY_ICONS[node.type] || Zap;

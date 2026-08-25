@@ -8,6 +8,8 @@ interface CityMapViewProps {
   nodes: InfrastructureNode[];
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string | null) => void;
+  traceTargetNodeId?: string | null;
+  onSelectTraceTarget?: (nodeId: string | null) => void;
   onSimulateFailure: (nodeId: string) => void;
   onViewDependencies: (nodeId: string) => void;
   simulatedStatuses?: Record<string, InfrastructureStatus>;
@@ -17,6 +19,8 @@ export const CityMapView: React.FC<CityMapViewProps> = ({
   nodes,
   selectedNodeId,
   onSelectNode,
+  traceTargetNodeId = null,
+  onSelectTraceTarget,
   onSimulateFailure,
   onViewDependencies,
   simulatedStatuses = {}
@@ -49,6 +53,8 @@ export const CityMapView: React.FC<CityMapViewProps> = ({
             nodes={nodes}
             selectedNodeId={selectedNodeId}
             onSelectNode={(id) => onSelectNode(id)}
+            traceTargetNodeId={traceTargetNodeId}
+            onSelectTraceTarget={onSelectTraceTarget}
             onSimulateFailure={onSimulateFailure}
             onViewDependencies={onViewDependencies}
             simulatedStatuses={simulatedStatuses}
@@ -57,15 +63,16 @@ export const CityMapView: React.FC<CityMapViewProps> = ({
         </div>
       </div>
 
-      {/* Slide-over Infrastructure Detail Panel */}
-      {selectedNode && (
-        <InfrastructureDetailPanel
-          node={selectedNode}
-          onClose={() => onSelectNode(null)}
-          onSimulateFailure={onSimulateFailure}
-          onViewDependencies={onViewDependencies}
-        />
-      )}
+      {/* Right Infrastructure Detail / Prompt Panel */}
+      <InfrastructureDetailPanel
+        node={selectedNode}
+        allNodes={nodes}
+        traceTargetNodeId={traceTargetNodeId}
+        onSelectTraceTarget={onSelectTraceTarget}
+        onClose={() => onSelectNode(null)}
+        onSimulateFailure={onSimulateFailure}
+        onViewDependencies={onViewDependencies}
+      />
     </div>
   );
 };

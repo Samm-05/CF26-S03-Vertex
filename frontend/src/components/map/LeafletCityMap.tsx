@@ -36,6 +36,8 @@ interface LeafletCityMapProps {
   nodes: InfrastructureNode[];
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string) => void;
+  traceTargetNodeId?: string | null;
+  onSelectTraceTarget?: (nodeId: string | null) => void;
   onSimulateFailure?: (nodeId: string) => void;
   onViewDependencies?: (nodeId: string) => void;
   simulatedStatuses?: Record<string, InfrastructureStatus>;
@@ -142,6 +144,7 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
   nodes,
   selectedNodeId,
   onSelectNode,
+  traceTargetNodeId = null,
   onSimulateFailure,
   onViewDependencies,
   simulatedStatuses = {},
@@ -236,6 +239,14 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
 
         const isSourceFailed = sourceStatus === 'failed';
 
+        // Check if edge is part of multi-select cascade trace
+        const isDirectTraceEdge =
+          selectedNodeId && traceTargetNodeId
+            ? (edge.source === selectedNodeId && edge.target === traceTargetNodeId) ||
+              (edge.source === selectedNodeId) ||
+              (edge.target === traceTargetNodeId)
+            : false;
+
         return {
           id: edge.id || `${edge.source}-${edge.target}`,
           sourceNode,
@@ -248,31 +259,39 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
           critical: edge.critical,
           strength: edge.strength ?? (edge.critical ? 0.9 : 0.6),
           isCascadeAffected,
-          isSourceFailed
+          isSourceFailed,
+          isDirectTraceEdge
         };
       })
       .filter((e): e is NonNullable<typeof e> => e !== null);
-  }, [links, filteredNodes, nodes, simulatedStatuses]);
+  }, [links, filteredNodes, nodes, simulatedStatuses, selectedNodeId, traceTargetNodeId]);
 
   // Create custom HTML DivIcon for each node
-  const createNodeDivIcon = (node: InfrastructureNode, isSelected: boolean) => {
+  const createNodeDivIcon = (node: InfrastructureNode, isSelected: boolean, isTraceTarget: boolean) => {
     const effectiveStatus = getNodeEffectiveStatus(node);
     const statusCfg = STATUS_COLOR_MAP[effectiveStatus] || STATUS_COLOR_MAP.operational;
     const svgIcon = CATEGORY_SVGS[node.category] || CATEGORY_SVGS.power;
-    const isPulsing = effectiveStatus === 'failed' || effectiveStatus === 'at_risk' || isSelected;
+    const isPulsing = effectiveStatus === 'failed' || effectiveStatus === 'at_risk' || isSelected || isTraceTarget;
 
     const pulseHtml = isPulsing
-      ? `<span class="absolute -inset-2 rounded-full animate-pulse-ring pointer-events-none" style="background-color: ${statusCfg.border};"></span>`
+      ? `<span class="absolute -inset-2 rounded-full animate-pulse-ring pointer-events-none" style="background-color: ${
+          isSelected && traceTargetNodeId ? '#C95C5C' : isTraceTarget ? '#5eead4' : statusCfg.border
+        };"></span>`
       : '';
 
-    const selectedRingHtml = isSelected
-      ? `<span class="absolute -inset-1 rounded-full ring-2 ring-[#5eead4] ring-offset-2 ring-offset-[#051F20]"></span>`
-      : '';
+    let ringHtml = '';
+    if (isSelected) {
+      ringHtml = traceTargetNodeId
+        ? `<span class="absolute -inset-1 rounded-full ring-2 ring-[#f87171] ring-offset-2 ring-offset-[#051F20]"></span>`
+        : `<span class="absolute -inset-1 rounded-full ring-2 ring-[#5eead4] ring-offset-2 ring-offset-[#051F20]"></span>`;
+    } else if (isTraceTarget) {
+      ringHtml = `<span class="absolute -inset-1 rounded-full ring-2 ring-[#38bdf8] ring-offset-2 ring-offset-[#051F20]"></span>`;
+    }
 
     const html = `
       <div class="relative w-8 h-8 flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-115">
         ${pulseHtml}
-        ${selectedRingHtml}
+        ${ringHtml}
         <div class="w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-lg transition-all"
              style="background-color: ${statusCfg.bg}; border-color: ${statusCfg.border}; color: ${statusCfg.text}; box-shadow: 0 0 12px ${statusCfg.glow};">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -332,33 +351,32 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
 
           {/* Dependency Polyline Edges across city */}
           {visibleEdges.map((edge) => {
+            const isTraceActive = selectedNodeId && traceTargetNodeId;
             const isDirectConnection = selectedNodeId
               ? edge.sourceNode.id === selectedNodeId || edge.targetNode.id === selectedNodeId
               : false;
 
-            const color = edge.isCascadeAffected
-              ? '#C95C5C'
-              : isDirectConnection
-              ? '#5eead4'
-              : '#8EB69B';
+            let color = '#8EB69B';
+            let opacity = 0.15;
+            let weight = 1.2;
+            let dashArray: string | undefined = '4, 8';
 
-            const opacity = edge.isCascadeAffected
-              ? 0.95
-              : isDirectConnection
-              ? 0.85
-              : 0.15;
-
-            const weight = edge.isCascadeAffected
-              ? 2.8
-              : isDirectConnection
-              ? 2.5
-              : 1.2;
-
-            const dashArray = edge.isCascadeAffected
-              ? '6, 6'
-              : isDirectConnection
-              ? undefined
-              : '4, 8';
+            if (edge.isCascadeAffected) {
+              color = '#C95C5C';
+              opacity = 0.95;
+              weight = 2.8;
+              dashArray = '6, 6';
+            } else if (isTraceActive && edge.isDirectTraceEdge) {
+              color = '#5eead4';
+              opacity = 1;
+              weight = 3.2;
+              dashArray = '6, 4';
+            } else if (isDirectConnection) {
+              color = '#5eead4';
+              opacity = 0.85;
+              weight = 2.5;
+              dashArray = undefined;
+            }
 
             return (
               <Polyline
@@ -369,7 +387,7 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
                   weight,
                   opacity,
                   dashArray,
-                  className: edge.isCascadeAffected ? 'cascade-active-edge' : undefined
+                  className: edge.isCascadeAffected || (isTraceActive && edge.isDirectTraceEdge) ? 'cascade-active-edge' : undefined
                 }}
               />
             );
@@ -378,9 +396,10 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
           {/* Infrastructure Asset Markers across city */}
           {filteredNodes.map((node) => {
             const isSelected = node.id === selectedNodeId;
+            const isTraceTarget = node.id === traceTargetNodeId;
             const effectiveStatus = getNodeEffectiveStatus(node);
             const statusCfg = STATUS_COLOR_MAP[effectiveStatus] || STATUS_COLOR_MAP.operational;
-            const icon = createNodeDivIcon(node, isSelected);
+            const icon = createNodeDivIcon(node, isSelected, isTraceTarget);
 
             return (
               <Marker

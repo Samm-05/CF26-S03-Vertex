@@ -21,7 +21,8 @@ import { AlertsDrawer } from './components/common/AlertsDrawer';
 export function App() {
   const [activeTab, setActiveTab] = useState<NavigationTab['id']>('dashboard');
   const [nodes] = useState<InfrastructureNode[]>(INITIAL_NODES);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>('power-station-a');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [traceTargetNodeId, setTraceTargetNodeId] = useState<string | null>(null);
   const [alertsOpen, setAlertsOpen] = useState(false);
 
   // Simulation Config State
@@ -55,6 +56,7 @@ export function App() {
 
     setSimulationConfig(demoConfig);
     setSelectedNodeId('power-station-a');
+    setTraceTargetNodeId(null);
     setActiveIntervention(null);
     const res = runCascadeSimulation(demoConfig, null);
     setCurrentResult(res);
@@ -87,13 +89,19 @@ export function App() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const activeScenarioName = useMemo(() => {
+    if (!selectedNodeId) return 'No Scenario Armed (Select on Map)';
+    const selected = nodes.find((n) => n.id === selectedNodeId);
+    return selected ? `${selected.name.split(' (')[0]} Outage` : 'No Scenario Armed';
+  }, [nodes, selectedNodeId]);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#051F20] text-[#DAF1DE]">
       {/* Persistent Desktop Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        activeScenarioName={currentResult.targetNodeName + ' Failure'}
+        activeScenarioName={activeScenarioName}
       />
 
       {/* Main Content Area */}
@@ -126,6 +134,8 @@ export function App() {
               nodes={nodes}
               selectedNodeId={selectedNodeId}
               onSelectNode={setSelectedNodeId}
+              traceTargetNodeId={traceTargetNodeId}
+              onSelectTraceTarget={setTraceTargetNodeId}
               simulatedStatuses={simulatedStatuses}
               onSimulateFailure={(nodeId) => {
                 setSimulationConfig((prev) => ({ ...prev, targetNodeId: nodeId }));
