@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', 'Manrope', sans-serif;
+  --radius-card: 16px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+/* Custom dark environmental scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #051F20;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #163832;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #235347;
+}
+
+/* Custom glow utility classes */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(35, 83, 71, 0.4);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 15px rgba(142, 182, 155, 0.25);
+}
+
+.glow-failed {
+  box-shadow: 0 0 20px rgba(201, 92, 92, 0.5);
+}
+
+.glow-risk {
+  box-shadow: 0 0 20px rgba(217, 164, 65, 0.5);
+}
+
+/* Ambient gradient background helper */
+.bg-ambient-gradient {
+  background: radial-gradient(circle at 50% 0%, #0B2B26 0%, #051F20 70%);
+}
+
+.glass-panel {
+  background-color: rgba(11, 43, 38, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(142, 182, 155, 0.12);
+}
+
+.glass-surface {
+  background-color: rgba(22, 56, 50, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(142, 182, 155, 0.15);
+}
+
+/* Subtle ripple keyframes for map & graph nodes */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
