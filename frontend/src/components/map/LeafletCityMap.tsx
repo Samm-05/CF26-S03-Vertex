@@ -332,10 +332,33 @@ export const LeafletCityMap: React.FC<LeafletCityMapProps> = ({
 
           {/* Dependency Polyline Edges across city */}
           {visibleEdges.map((edge) => {
-            const color = edge.isCascadeAffected ? '#C95C5C' : '#5eead4';
-            const opacity = edge.isCascadeAffected ? 0.9 : 0.4;
-            const weight = Math.max(1.8, edge.strength * 3.5);
-            const dashArray = edge.isCascadeAffected ? '6, 6' : undefined;
+            const isDirectConnection = selectedNodeId
+              ? edge.sourceNode.id === selectedNodeId || edge.targetNode.id === selectedNodeId
+              : false;
+
+            const color = edge.isCascadeAffected
+              ? '#C95C5C'
+              : isDirectConnection
+              ? '#5eead4'
+              : '#8EB69B';
+
+            const opacity = edge.isCascadeAffected
+              ? 0.95
+              : isDirectConnection
+              ? 0.85
+              : 0.15;
+
+            const weight = edge.isCascadeAffected
+              ? 2.8
+              : isDirectConnection
+              ? 2.5
+              : 1.2;
+
+            const dashArray = edge.isCascadeAffected
+              ? '6, 6'
+              : isDirectConnection
+              ? undefined
+              : '4, 8';
 
             return (
               <Polyline
