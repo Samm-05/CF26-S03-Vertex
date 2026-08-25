@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import type {
   NavigationTab,
   InfrastructureNode,
+  InfrastructureStatus,
   SimulationConfig,
   SimulationResult,
   Intervention
@@ -73,6 +74,17 @@ export function App() {
     setCurrentResult(updatedResult);
   };
 
+  // Compute current node status states across the simulated cascade
+  const simulatedStatuses = useMemo(() => {
+    const map: Record<string, InfrastructureStatus> = {};
+    if (currentResult && currentResult.timeline) {
+      for (const step of currentResult.timeline) {
+        map[step.nodeId] = step.newStatus;
+      }
+    }
+    return map;
+  }, [currentResult]);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -114,6 +126,7 @@ export function App() {
               nodes={nodes}
               selectedNodeId={selectedNodeId}
               onSelectNode={setSelectedNodeId}
+              simulatedStatuses={simulatedStatuses}
               onSimulateFailure={(nodeId) => {
                 setSimulationConfig((prev) => ({ ...prev, targetNodeId: nodeId }));
                 setActiveTab('simulator');
@@ -131,6 +144,8 @@ export function App() {
               links={DEPENDENCY_LINKS}
               selectedNodeId={selectedNodeId}
               onSelectNode={(id) => setSelectedNodeId(id)}
+              simulatedStatuses={simulatedStatuses}
+              onNavigateToResults={() => setActiveTab('results')}
               onSimulateFailure={(nodeId) => {
                 setSimulationConfig((prev) => ({ ...prev, targetNodeId: nodeId }));
                 setActiveTab('simulator');

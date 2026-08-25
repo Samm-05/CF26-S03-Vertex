@@ -1,31 +1,32 @@
 import React from 'react';
 import type { InfrastructureNode, DependencyLink } from '../types';
-import { DependencyGraph } from '../components/network/DependencyGraph';
+import { DependencyNetworkScreen } from '../features/dependency-network/DependencyNetworkScreen';
 
 interface NetworkViewProps {
   nodes: InfrastructureNode[];
   links: DependencyLink[];
   selectedNodeId: string | null;
-  onSelectNode: (nodeId: string) => void;
+  onSelectNode: (nodeId: string | null) => void;
   onSimulateFailure: (nodeId: string) => void;
+  onNavigateToResults?: () => void;
+  simulatedStatuses?: Record<string, string>;
 }
 
 export const NetworkView: React.FC<NetworkViewProps> = ({
-  nodes,
-  links,
   selectedNodeId,
   onSelectNode,
-  onSimulateFailure
+  onSimulateFailure,
+  onNavigateToResults,
+  simulatedStatuses
 }) => {
   return (
-    <div className="h-[calc(100vh-4rem)] p-4 md:p-6 flex flex-col overflow-hidden">
-      <DependencyGraph
-        nodes={nodes}
-        links={links}
-        selectedNodeId={selectedNodeId}
-        onSelectNode={onSelectNode}
-        onSimulateFailure={onSimulateFailure}
-      />
-    </div>
+    <DependencyNetworkScreen
+      selectedNodeId={selectedNodeId}
+      onSelectNode={onSelectNode}
+      onSimulateFailure={onSimulateFailure}
+      onNavigateToResults={onNavigateToResults}
+      simulatedStatuses={simulatedStatuses}
+    />
   );
 };
+export default NetworkView;

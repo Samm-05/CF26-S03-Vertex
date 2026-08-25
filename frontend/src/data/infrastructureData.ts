@@ -1,169 +1,222 @@
 import type { InfrastructureNode, DependencyLink, Intervention } from '../types';
 
 export const INITIAL_NODES: InfrastructureNode[] = [
-  // LEVEL 1: Power Backbone
+  // LEVEL 1: Power Backbone (North & South Generation & Substations)
   {
     id: 'power-station-a',
-    name: 'Power Station A',
+    name: 'Power Station A (Koradi Thermal)',
     category: 'power',
+    type: 'power',
+    lat: 21.2420,
+    lng: 79.0980,
     criticality: 94,
     capacity: '500 MW (Primary Grid)',
+    capacityNumeric: 500,
+    currentLoad: 435,
     status: 'operational',
     connectedSystemsCount: 12,
     dependentSystemsCount: 8,
     backupAvailable: true,
     backupDetails: 'Auxiliary diesel generator (15% capacity, max 4h)',
+    redundancySources: ['power-station-b'],
     failureProbability: 12,
     populationImpact: 240000,
-    coordinates: { x: 28, y: 32, district: 'North Industrial' },
+    coordinates: { x: 28, y: 15, lat: 21.2420, lng: 79.0980, district: 'Koradi North Sector' },
     level: 1,
     dependencies: [],
-    dependents: ['water-plant-b', 'telecom-hub-c', 'hospital-network-a', 'transport-hub-d'],
-    description: 'Primary thermal energy generation hub providing base power to North & Central Districts.'
+    dependents: ['water-plant-b', 'telecom-hub-c', 'hospital-network-a', 'transport-hub-d', 'industrial-alpha'],
+    description: 'Primary high-voltage thermal energy generation hub providing base load power to North, Central, and West districts.'
   },
   {
     id: 'power-station-b',
-    name: 'Power Station B',
+    name: 'Power Station B (MIHAN Substation)',
     category: 'power',
+    type: 'power',
+    lat: 21.0650,
+    lng: 79.0480,
     criticality: 88,
     capacity: '350 MW (Substation)',
+    capacityNumeric: 350,
+    currentLoad: 290,
     status: 'operational',
     connectedSystemsCount: 9,
     dependentSystemsCount: 6,
     backupAvailable: true,
     backupDetails: 'Battery storage bank (30 min full load)',
+    redundancySources: ['power-station-a'],
     failureProbability: 8,
     populationImpact: 160000,
-    coordinates: { x: 72, y: 25, district: 'East Tech Park' },
+    coordinates: { x: 72, y: 85, lat: 21.0650, lng: 79.0480, district: 'MIHAN South Sector' },
     level: 1,
     dependencies: [],
     dependents: ['water-plant-a', 'telecom-hub-a', 'hospital-network-b'],
-    description: 'Secondary power plant servicing South Bay and Eastern commercial zones.'
+    description: 'Secondary high-capacity substation servicing the South Metro, Airport Corridor, and Eastern commercial belts.'
   },
 
-  // LEVEL 2: Water & Core Telecom
+  // LEVEL 2: Water & Core Telecom (North-West, West, Central, South)
   {
     id: 'water-plant-b',
-    name: 'Water Plant B',
+    name: 'Water Plant B (Gorewada Complex)',
     category: 'water',
+    type: 'water',
+    lat: 21.1960,
+    lng: 79.0430,
     criticality: 91,
     capacity: '120 MLD (Mega Liters/Day)',
+    capacityNumeric: 120,
+    currentLoad: 108,
     status: 'operational',
     connectedSystemsCount: 8,
     dependentSystemsCount: 6,
     backupAvailable: false,
     backupDetails: 'No redundant power supply installed',
+    redundancySources: ['water-plant-a'],
     failureProbability: 24,
     populationImpact: 180000,
-    coordinates: { x: 38, y: 48, district: 'Riverside Basin' },
+    coordinates: { x: 38, y: 28, lat: 21.1960, lng: 79.0430, district: 'Gorewada North-West' },
     level: 2,
     dependencies: ['power-station-a'],
     dependents: ['hospital-network-a', 'residential-zone-a', 'industrial-alpha'],
-    description: 'Central water filtration & pumping facility serving 180K residents and central trauma centers.'
+    description: 'Major water filtration & pumping facility serving 180K residents across Central, North, and trauma centers.'
   },
   {
     id: 'water-plant-a',
-    name: 'Water Plant A',
+    name: 'Water Plant A (Ambazari Works)',
     category: 'water',
+    type: 'water',
+    lat: 21.1310,
+    lng: 79.0450,
     criticality: 84,
     capacity: '90 MLD',
+    capacityNumeric: 90,
+    currentLoad: 78,
     status: 'operational',
     connectedSystemsCount: 6,
     dependentSystemsCount: 4,
     backupAvailable: true,
     backupDetails: 'Emergency reservoir storage (12 hours)',
+    redundancySources: ['water-plant-b'],
     failureProbability: 10,
     populationImpact: 110000,
-    coordinates: { x: 78, y: 42, district: 'Eastern Heights' },
+    coordinates: { x: 78, y: 55, lat: 21.1310, lng: 79.0450, district: 'Ambazari West Sector' },
     level: 2,
     dependencies: ['power-station-b'],
     dependents: ['residential-zone-b', 'hospital-network-b'],
-    description: 'Eastern sector water treatment facility feeding South Bay residential grid.'
+    description: 'West-sector water treatment facility feeding South Bay, VNIT campus, and residential grids.'
   },
   {
     id: 'telecom-hub-c',
-    name: 'Telecom Hub C',
+    name: 'Telecom Hub C (Sitabuldi Central)',
     category: 'telecom',
+    type: 'telecom',
+    lat: 21.1475,
+    lng: 79.0880,
     criticality: 86,
     capacity: '10 Gbps Fiber Backbone',
+    capacityNumeric: 10,
+    currentLoad: 8.6,
     status: 'operational',
     connectedSystemsCount: 11,
     dependentSystemsCount: 7,
     backupAvailable: true,
     backupDetails: 'UPS battery bank (4 hours)',
+    redundancySources: ['telecom-hub-a'],
     failureProbability: 15,
     populationImpact: 210000,
-    coordinates: { x: 45, y: 28, district: 'Central Business District' },
+    coordinates: { x: 45, y: 48, lat: 21.1475, lng: 79.0880, district: 'Sitabuldi Central Core' },
     level: 2,
     dependencies: ['power-station-a'],
     dependents: ['emergency-center-a', 'transport-hub-d', 'residential-zone-a'],
-    description: 'Primary data center & SCADA communications node routing citywide IoT traffic.'
+    description: 'Primary metropolitan data center & SCADA communications backbone routing citywide IoT and transit telemetry.'
   },
   {
     id: 'telecom-hub-a',
-    name: 'Telecom Hub A',
+    name: 'Telecom Hub A (MIHAN Gateway)',
     category: 'telecom',
+    type: 'telecom',
+    lat: 21.0780,
+    lng: 79.0620,
     criticality: 79,
     capacity: '5 Gbps Sub-node',
+    capacityNumeric: 5,
+    currentLoad: 4.1,
     status: 'operational',
     connectedSystemsCount: 5,
     dependentSystemsCount: 3,
     backupAvailable: true,
     backupDetails: 'UPS battery bank (2 hours)',
+    redundancySources: ['telecom-hub-c'],
     failureProbability: 9,
     populationImpact: 95000,
-    coordinates: { x: 65, y: 35, district: 'South Suburbs' },
+    coordinates: { x: 65, y: 78, lat: 21.0780, lng: 79.0620, district: 'MIHAN Tech Gateway' },
     level: 2,
     dependencies: ['power-station-b'],
     dependents: ['emergency-center-a'],
-    description: 'Secondary communications relay node supporting emergency dispatch backup routing.'
+    description: 'Southern tech corridor communications relay node supporting emergency dispatch backup routing.'
   },
 
-  // LEVEL 3: Healthcare & Transport
+  // LEVEL 3: Healthcare & Transport (Central Medical, South AIIMS, Central Interchange)
   {
     id: 'hospital-network-a',
-    name: 'Hospital Network A',
+    name: 'Hospital Network A (GMCH Trauma)',
     category: 'healthcare',
+    type: 'healthcare',
+    lat: 21.1340,
+    lng: 79.1010,
     criticality: 82,
     capacity: '850 Beds (Trauma Level 1)',
+    capacityNumeric: 850,
+    currentLoad: 780,
     status: 'operational',
     connectedSystemsCount: 7,
     dependentSystemsCount: 4,
     backupAvailable: true,
     backupDetails: 'Diesel generator (6 hours fuel capacity)',
+    redundancySources: ['hospital-network-b'],
     failureProbability: 18,
     populationImpact: 85000,
-    coordinates: { x: 48, y: 62, district: 'Central Medical District' },
+    coordinates: { x: 48, y: 52, lat: 21.1340, lng: 79.1010, district: 'Medical Square Central' },
     level: 3,
     dependencies: ['power-station-a', 'water-plant-b'],
     dependents: ['emergency-center-a'],
-    description: 'Regional level-1 trauma center & intensive emergency response care unit.'
+    description: 'Premier government medical college & level-1 trauma emergency response hospital for the city.'
   },
   {
     id: 'hospital-network-b',
-    name: 'Hospital Network B',
+    name: 'Hospital Network B (AIIMS Campus)',
     category: 'healthcare',
+    type: 'healthcare',
+    lat: 21.0590,
+    lng: 79.0340,
     criticality: 78,
     capacity: '450 Beds',
+    capacityNumeric: 450,
+    currentLoad: 390,
     status: 'operational',
     connectedSystemsCount: 4,
     dependentSystemsCount: 2,
     backupAvailable: true,
     backupDetails: 'Backup generator (8 hours)',
+    redundancySources: ['hospital-network-a'],
     failureProbability: 11,
     populationImpact: 45000,
-    coordinates: { x: 82, y: 58, district: 'East Community' },
+    coordinates: { x: 82, y: 88, lat: 21.0590, lng: 79.0340, district: 'AIIMS South Metropolis' },
     level: 3,
     dependencies: ['power-station-b', 'water-plant-a'],
     dependents: [],
-    description: 'Secondary community healthcare facility & emergency pediatric center.'
+    description: 'Advanced super-speciality national institute hospital serving southern metropolitan zones.'
   },
   {
     id: 'transport-hub-d',
-    name: 'Transport Hub D',
+    name: 'Transport Hub D (Central Station & Metro)',
     category: 'transport',
+    type: 'transport',
+    lat: 21.1530,
+    lng: 79.0895,
     criticality: 74,
     capacity: '180K Commuters / Day',
+    capacityNumeric: 180000,
+    currentLoad: 165000,
     status: 'operational',
     connectedSystemsCount: 6,
     dependentSystemsCount: 3,
@@ -171,20 +224,25 @@ export const INITIAL_NODES: InfrastructureNode[] = [
     backupDetails: 'Substation automated transfer switch',
     failureProbability: 16,
     populationImpact: 180000,
-    coordinates: { x: 32, y: 55, district: 'Central Station' },
+    coordinates: { x: 32, y: 46, lat: 21.1530, lng: 79.0895, district: 'Central Station Interchange' },
     level: 3,
     dependencies: ['power-station-a', 'telecom-hub-c'],
     dependents: ['emergency-center-a', 'industrial-alpha'],
-    description: 'Central rail, metro line, and bus transit exchange center.'
+    description: 'Central railway junction and metro interchange connecting North-South and East-West transit corridors.'
   },
 
-  // LEVEL 4: Emergency & Industrial
+  // LEVEL 4: Emergency & Industrial (Civil Lines HQ, Hingna MIDC)
   {
     id: 'emergency-center-a',
-    name: 'Emergency Center A',
+    name: 'Emergency Center A (Civil Lines HQ)',
     category: 'emergency',
+    type: 'emergency',
+    lat: 21.1585,
+    lng: 79.0680,
     criticality: 80,
     capacity: '911 Dispatch & Operations Command',
+    capacityNumeric: 100,
+    currentLoad: 72,
     status: 'operational',
     connectedSystemsCount: 8,
     dependentSystemsCount: 5,
@@ -192,18 +250,23 @@ export const INITIAL_NODES: InfrastructureNode[] = [
     backupDetails: 'Emergency solar + battery array (12 hours)',
     failureProbability: 14,
     populationImpact: 240000,
-    coordinates: { x: 55, y: 48, district: 'Civic Core' },
+    coordinates: { x: 55, y: 44, lat: 21.1585, lng: 79.0680, district: 'Civil Lines Civic Core' },
     level: 4,
     dependencies: ['telecom-hub-c', 'hospital-network-a', 'transport-hub-d'],
     dependents: ['residential-zone-a', 'residential-zone-b'],
-    description: 'Centralized 911 dispatch, disaster coordination center, and emergency fleet routing.'
+    description: 'Integrated police, fire, 911 dispatch, and metropolitan disaster response command headquarters.'
   },
   {
     id: 'industrial-alpha',
-    name: 'Industrial Zone Alpha',
+    name: 'Industrial Zone Alpha (Hingna MIDC)',
     category: 'industrial',
+    type: 'industrial',
+    lat: 21.1080,
+    lng: 79.0080,
     criticality: 72,
     capacity: '45 Advanced Manufacturing Facilities',
+    capacityNumeric: 45,
+    currentLoad: 41,
     status: 'operational',
     connectedSystemsCount: 5,
     dependentSystemsCount: 2,
@@ -211,20 +274,25 @@ export const INITIAL_NODES: InfrastructureNode[] = [
     backupDetails: 'Local grid feed only',
     failureProbability: 20,
     populationImpact: 35000,
-    coordinates: { x: 22, y: 70, district: 'Port & Heavy Industry' },
+    coordinates: { x: 22, y: 68, lat: 21.1080, lng: 79.0080, district: 'Hingna MIDC West' },
     level: 4,
     dependencies: ['power-station-a', 'water-plant-b'],
     dependents: [],
-    description: 'High-density industrial sector including chemical processing and logistical warehouses.'
+    description: 'Heavy industrial and automotive manufacturing hub with chemical processing facilities.'
   },
 
-  // LEVEL 5: Residential & Public Facilities
+  // LEVEL 5: Residential & Public Education (North Jaripatka, East Pardi)
   {
     id: 'residential-zone-a',
-    name: 'Residential Zone A',
+    name: 'Residential Zone A (Jaripatka Campus)',
     category: 'schools', // combined housing & civic schools
+    type: 'schools',
+    lat: 21.1880,
+    lng: 79.1120,
     criticality: 65,
     capacity: '120K Population Density',
+    capacityNumeric: 120000,
+    currentLoad: 114000,
     status: 'operational',
     connectedSystemsCount: 4,
     dependentSystemsCount: 0,
@@ -232,18 +300,23 @@ export const INITIAL_NODES: InfrastructureNode[] = [
     backupDetails: 'None',
     failureProbability: 5,
     populationImpact: 120000,
-    coordinates: { x: 42, y: 78, district: 'North Metro Housing' },
+    coordinates: { x: 42, y: 32, lat: 21.1880, lng: 79.1120, district: 'Jaripatka North-East' },
     level: 5,
     dependencies: ['water-plant-b', 'telecom-hub-c', 'emergency-center-a'],
     dependents: [],
-    description: 'High-density residential neighborhood, 14 schools, and local civic centers.'
+    description: 'High-density northern residential district, 14 schools, and local civic centers.'
   },
   {
     id: 'residential-zone-b',
-    name: 'Residential Zone B',
+    name: 'Residential Zone B (Pardi East Campus)',
     category: 'schools',
+    type: 'schools',
+    lat: 21.1480,
+    lng: 79.1620,
     criticality: 60,
     capacity: '85K Population Density',
+    capacityNumeric: 85000,
+    currentLoad: 82000,
     status: 'operational',
     connectedSystemsCount: 3,
     dependentSystemsCount: 0,
@@ -251,53 +324,53 @@ export const INITIAL_NODES: InfrastructureNode[] = [
     backupDetails: 'None',
     failureProbability: 5,
     populationImpact: 85000,
-    coordinates: { x: 75, y: 72, district: 'South Bay Residences' },
+    coordinates: { x: 75, y: 50, lat: 21.1480, lng: 79.1620, district: 'Pardi East Sector' },
     level: 5,
     dependencies: ['water-plant-a', 'emergency-center-a'],
     dependents: [],
-    description: 'Suburban housing community and secondary education campus.'
+    description: 'Eastern metropolitan housing sector, secondary schools, and trade institutes.'
   }
 ];
 
 export const DEPENDENCY_LINKS: DependencyLink[] = [
   // Power Station A outbound links
-  { source: 'power-station-a', target: 'water-plant-b', type: 'Primary Electric Power (138kV)', critical: true },
-  { source: 'power-station-a', target: 'telecom-hub-c', type: 'High-Reliability Grid Feed', critical: true },
-  { source: 'power-station-a', target: 'hospital-network-a', type: 'Direct Feeder Line', critical: true },
-  { source: 'power-station-a', target: 'transport-hub-d', type: 'Traction Power Grid', critical: false },
-  { source: 'power-station-a', target: 'industrial-alpha', type: 'Heavy Industrial Line', critical: false },
+  { id: 'edge-psa-wpb', source: 'power-station-a', target: 'water-plant-b', type: 'Primary Electric Power (138kV)', critical: true, strength: 0.95 },
+  { id: 'edge-psa-thc', source: 'power-station-a', target: 'telecom-hub-c', type: 'High-Reliability Grid Feed', critical: true, strength: 0.9 },
+  { id: 'edge-psa-hna', source: 'power-station-a', target: 'hospital-network-a', type: 'Direct Feeder Line', critical: true, strength: 0.92 },
+  { id: 'edge-psa-thd', source: 'power-station-a', target: 'transport-hub-d', type: 'Traction Power Grid', critical: false, strength: 0.65 },
+  { id: 'edge-psa-ind', source: 'power-station-a', target: 'industrial-alpha', type: 'Heavy Industrial Line', critical: false, strength: 0.6 },
 
   // Power Station B outbound links
-  { source: 'power-station-b', target: 'water-plant-a', type: 'Primary Substation Feed', critical: true },
-  { source: 'power-station-b', target: 'telecom-hub-a', type: 'Grid Feed', critical: false },
-  { source: 'power-station-b', target: 'hospital-network-b', type: 'Feeder Line', critical: true },
+  { id: 'edge-psb-wpa', source: 'power-station-b', target: 'water-plant-a', type: 'Primary Substation Feed', critical: true, strength: 0.9 },
+  { id: 'edge-psb-tha', source: 'power-station-b', target: 'telecom-hub-a', type: 'Grid Feed', critical: false, strength: 0.55 },
+  { id: 'edge-psb-hnb', source: 'power-station-b', target: 'hospital-network-b', type: 'Feeder Line', critical: true, strength: 0.85 },
 
   // Water Plant B outbound links
-  { source: 'water-plant-b', target: 'hospital-network-a', type: 'Sterile Water Supply (Main Branch)', critical: true },
-  { source: 'water-plant-b', target: 'residential-zone-a', type: 'Municipal Water Pressure Main', critical: true },
-  { source: 'water-plant-b', target: 'industrial-alpha', type: 'Cooling Water Branch', critical: false },
+  { id: 'edge-wpb-hna', source: 'water-plant-b', target: 'hospital-network-a', type: 'Sterile Water Supply (Main Branch)', critical: true, strength: 0.92 },
+  { id: 'edge-wpb-rza', source: 'water-plant-b', target: 'residential-zone-a', type: 'Municipal Water Pressure Main', critical: true, strength: 0.88 },
+  { id: 'edge-wpb-ind', source: 'water-plant-b', target: 'industrial-alpha', type: 'Cooling Water Branch', critical: false, strength: 0.5 },
 
   // Water Plant A outbound links
-  { source: 'water-plant-a', target: 'residential-zone-b', type: 'East District Main', critical: true },
-  { source: 'water-plant-a', target: 'hospital-network-b', type: 'Medical Water Line', critical: true },
+  { id: 'edge-wpa-rzb', source: 'water-plant-a', target: 'residential-zone-b', type: 'East District Main', critical: true, strength: 0.85 },
+  { id: 'edge-wpa-hnb', source: 'water-plant-a', target: 'hospital-network-b', type: 'Medical Water Line', critical: true, strength: 0.86 },
 
   // Telecom Hub C outbound links
-  { source: 'telecom-hub-c', target: 'emergency-center-a', type: 'Fiber Optic SCADA & 911 Trunk', critical: true },
-  { source: 'telecom-hub-c', target: 'transport-hub-d', type: 'Automated Signaling Network', critical: true },
-  { source: 'telecom-hub-c', target: 'residential-zone-a', type: 'Consumer Broadband Node', critical: false },
+  { id: 'edge-thc-eca', source: 'telecom-hub-c', target: 'emergency-center-a', type: 'Fiber Optic SCADA & 911 Trunk', critical: true, strength: 0.94 },
+  { id: 'edge-thc-thd', source: 'telecom-hub-c', target: 'transport-hub-d', type: 'Automated Signaling Network', critical: true, strength: 0.8 },
+  { id: 'edge-thc-rza', source: 'telecom-hub-c', target: 'residential-zone-a', type: 'Consumer Broadband Node', critical: false, strength: 0.5 },
 
   // Telecom Hub A outbound links
-  { source: 'telecom-hub-a', target: 'emergency-center-a', type: 'Radio Backup Link', critical: false },
+  { id: 'edge-tha-eca', source: 'telecom-hub-a', target: 'emergency-center-a', type: 'Radio Backup Link', critical: false, strength: 0.55 },
 
   // Hospital Network A outbound
-  { source: 'hospital-network-a', target: 'emergency-center-a', type: 'Triage Coordination Protocol', critical: true },
+  { id: 'edge-hna-eca', source: 'hospital-network-a', target: 'emergency-center-a', type: 'Triage Coordination Protocol', critical: true, strength: 0.82 },
 
   // Transport Hub D outbound
-  { source: 'transport-hub-d', target: 'emergency-center-a', type: 'Emergency Evacuation Transit Corridor', critical: true },
+  { id: 'edge-thd-eca', source: 'transport-hub-d', target: 'emergency-center-a', type: 'Emergency Evacuation Transit Corridor', critical: true, strength: 0.75 },
 
   // Emergency Center A outbound
-  { source: 'emergency-center-a', target: 'residential-zone-a', type: 'Disaster Patrol & Response Fleet', critical: true },
-  { source: 'emergency-center-a', target: 'residential-zone-b', type: 'Emergency Broadcast & Dispatch', critical: false }
+  { id: 'edge-eca-rza', source: 'emergency-center-a', target: 'residential-zone-a', type: 'Disaster Patrol & Response Fleet', critical: true, strength: 0.8 },
+  { id: 'edge-eca-rzb', source: 'emergency-center-a', target: 'residential-zone-b', type: 'Emergency Broadcast & Dispatch', critical: false, strength: 0.6 }
 ];
 
 export const AVAILABLE_INTERVENTIONS: Intervention[] = [

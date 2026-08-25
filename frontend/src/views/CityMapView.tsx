@@ -1,6 +1,6 @@
-import React from 'react';
-import type { InfrastructureNode } from '../types';
-import { InfrastructureMap } from '../components/map/InfrastructureMap';
+import React, { useState } from 'react';
+import type { InfrastructureNode, InfrastructureStatus } from '../types';
+import { LeafletCityMap } from '../components/map/LeafletCityMap';
 import { InfrastructureDetailPanel } from '../components/map/InfrastructureDetailPanel';
 import { Map } from 'lucide-react';
 
@@ -10,6 +10,7 @@ interface CityMapViewProps {
   onSelectNode: (nodeId: string | null) => void;
   onSimulateFailure: (nodeId: string) => void;
   onViewDependencies: (nodeId: string) => void;
+  simulatedStatuses?: Record<string, InfrastructureStatus>;
 }
 
 export const CityMapView: React.FC<CityMapViewProps> = ({
@@ -17,34 +18,41 @@ export const CityMapView: React.FC<CityMapViewProps> = ({
   selectedNodeId,
   onSelectNode,
   onSimulateFailure,
-  onViewDependencies
+  onViewDependencies,
+  simulatedStatuses = {}
 }) => {
+  const [filteredCount, setFilteredCount] = useState<number>(nodes.length);
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) || null;
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row overflow-hidden relative">
       {/* Main Interactive Map Viewport */}
-      <div className="flex-1 p-4 md:p-6 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 p-4 md:p-6 flex flex-col h-full overflow-hidden min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <div>
             <div className="flex items-center space-x-2 text-xs font-mono text-[#8EB69B] uppercase tracking-wider mb-0.5">
-              <Map size={14} />
+              <Map size={14} className="text-[#5eead4]" />
               <span>Interactive Spatial Grid</span>
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-[#DAF1DE]">City Infrastructure Map</h1>
           </div>
-          <div className="text-xs text-[#8EB69B] bg-[#0B2B26] px-3 py-1.5 rounded-xl border border-[#8EB69B]/20 font-mono">
-            {nodes.length} Live Asset Markers
+          <div className="text-xs text-[#8EB69B] bg-[#0B2B26] px-3.5 py-1.5 rounded-xl border border-[#8EB69B]/20 font-mono shadow-sm flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-[#5eead4] animate-pulse" />
+            <span>{filteredCount} Live Asset Markers</span>
           </div>
         </div>
 
-        {/* Map Canvas */}
-        <div className="flex-1 w-full relative overflow-hidden">
-          <InfrastructureMap
+        {/* Real Geographic Map Canvas */}
+        <div className="flex-1 w-full relative overflow-hidden rounded-card">
+          <LeafletCityMap
             nodes={nodes}
             selectedNodeId={selectedNodeId}
             onSelectNode={(id) => onSelectNode(id)}
+            onSimulateFailure={onSimulateFailure}
+            onViewDependencies={onViewDependencies}
+            simulatedStatuses={simulatedStatuses}
+            onFilteredCountChange={setFilteredCount}
           />
         </div>
       </div>
@@ -61,3 +69,4 @@ export const CityMapView: React.FC<CityMapViewProps> = ({
     </div>
   );
 };
+export default CityMapView;

@@ -19,18 +19,26 @@ export interface InfrastructureNode {
   id: string;
   name: string;
   category: InfrastructureCategory;
+  type?: InfrastructureCategory; // alias for compatibility
+  lat: number;
+  lng: number;
   criticality: number; // 0 - 100
   capacity: string;
+  capacityNumeric?: number;
+  currentLoad?: number;
   status: InfrastructureStatus;
   connectedSystemsCount: number;
   dependentSystemsCount: number;
   backupAvailable: boolean;
   backupDetails?: string;
+  redundancySources?: string[];
   failureProbability: number; // percentage
   populationImpact: number;
   coordinates: {
     x: number; // relative map x % (0 - 100)
     y: number; // relative map y % (0 - 100)
+    lat?: number;
+    lng?: number;
     district: string;
   };
   level: number; // Cascade tier level 1..5
@@ -40,10 +48,21 @@ export interface InfrastructureNode {
 }
 
 export interface DependencyLink {
+  id?: string;
   source: string;
   target: string;
   type: string;
   critical: boolean;
+  strength?: number; // 0..1 critical strength
+}
+
+export interface DependencyEdge {
+  id: string;
+  source: string;
+  target: string;
+  strength: number;
+  type?: string;
+  critical?: boolean;
 }
 
 export interface SimulationConfig {

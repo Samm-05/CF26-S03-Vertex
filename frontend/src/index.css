@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 @theme {
   --font-sans: 'Inter', 'Manrope', sans-serif;
@@ -62,6 +63,115 @@
   border: 1px solid rgba(142, 182, 155, 0.15);
 }
 
+/* Leaflet Custom Command-Center Theme Overrides */
+.leaflet-container {
+  background-color: #051F20 !important;
+  font-family: inherit !important;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Hide default attribution background or restyle */
+.leaflet-control-attribution {
+  background: rgba(11, 43, 38, 0.85) !important;
+  color: rgba(142, 182, 155, 0.6) !important;
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(142, 182, 155, 0.15) !important;
+  margin: 0 8px 8px 0 !important;
+}
+
+.leaflet-control-attribution a {
+  color: #8EB69B !important;
+  text-decoration: none !important;
+}
+
+.leaflet-control-attribution a:hover {
+  color: #DAF1DE !important;
+  text-decoration: underline !important;
+}
+
+/* Leaflet Zoom Controls Dark Theme */
+.leaflet-bar {
+  border: 1px solid rgba(142, 182, 155, 0.2) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-bar a {
+  background-color: rgba(11, 43, 38, 0.9) !important;
+  color: #DAF1DE !important;
+  border-bottom: 1px solid rgba(142, 182, 155, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #163832 !important;
+  color: #5eead4 !important;
+}
+
+.leaflet-bar a.leaflet-disabled {
+  background-color: rgba(5, 31, 32, 0.8) !important;
+  color: rgba(142, 182, 155, 0.3) !important;
+}
+
+/* Custom Leaflet Popups */
+.leaflet-popup-content-wrapper {
+  background: rgba(11, 43, 38, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  color: #DAF1DE !important;
+  border: 1px solid rgba(142, 182, 155, 0.3) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip-container {
+  overflow: visible !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(11, 43, 38, 0.95) !important;
+  border: 1px solid rgba(142, 182, 155, 0.3) !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-close-button {
+  color: #8EB69B !important;
+  padding: 8px 8px 0 0 !important;
+  font-size: 18px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #DAF1DE !important;
+}
+
+/* Custom Marker DivIcon Reset */
+.custom-leaflet-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Animated edge dash for cascading flows */
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.leaflet-interactive.cascade-active-edge,
+.animate-flow-dash {
+  animation: flowDash 1.2s linear infinite;
+}
+
 /* Subtle ripple keyframes for map & graph nodes */
 @keyframes pulse-ring {
   0% {
@@ -80,4 +190,15 @@
 
 .animate-pulse-ring {
   animation: pulse-ring 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-ring {
+    animation: none;
+    opacity: 0.4;
+  }
+  .leaflet-interactive.cascade-active-edge,
+  .animate-flow-dash {
+    animation: none;
+  }
 }
