@@ -10,12 +10,14 @@ import { CascadeExplanationCard } from '../components/results/CascadeExplanation
 import { InterventionSimulator } from '../components/results/InterventionSimulator';
 import { BeforeAfterComparison } from '../components/results/BeforeAfterComparison';
 import { RecommendationEngineCard } from '../components/results/RecommendationEngineCard';
+import { ExportBriefModal } from '../features/results/export-brief/ExportBriefModal';
 import {
   BarChart3,
   Hospital,
   Droplets,
   Train,
-  Radio
+  Radio,
+  FileText
 } from 'lucide-react';
 
 interface ResultsViewProps {
@@ -32,6 +34,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   const [selectedIntervention, setSelectedIntervention] = useState<Intervention>(
     activeIntervention || AVAILABLE_INTERVENTIONS[0]
   );
+  const [isExportBriefOpen, setIsExportBriefOpen] = useState(false);
 
   // Compute comparative metrics
   const comparison: ComparisonResult = calculateBeforeAfterComparison(
@@ -58,12 +61,33 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
           </p>
         </div>
 
-        {activeIntervention && (
-          <span className="self-start md:self-auto text-xs font-mono font-bold px-3 py-1.5 bg-[#235347] text-[#DAF1DE] rounded-xl border border-[#8EB69B]/40">
-            Active Mitigation Model: {activeIntervention.title}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {activeIntervention && (
+            <span className="text-xs font-mono font-bold px-3 py-1.5 bg-[#235347] text-[#DAF1DE] rounded-xl border border-[#8EB69B]/40">
+              Active Mitigation Model: {activeIntervention.title}
+            </span>
+          )}
+
+          {/* Export Brief Button */}
+          <button
+            type="button"
+            onClick={() => setIsExportBriefOpen(true)}
+            className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-[#DAF1DE] border border-[#8EB69B]/30 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95"
+            title="Export Executive Cascade Mitigation Brief"
+          >
+            <FileText size={14} className="text-[#5eead4]" />
+            <span>Export Brief</span>
+          </button>
+        </div>
       </div>
+
+      {/* Export Executive Brief Modal */}
+      <ExportBriefModal
+        isOpen={isExportBriefOpen}
+        onClose={() => setIsExportBriefOpen(false)}
+        result={result}
+        activeIntervention={activeIntervention}
+      />
 
       {/* TOP RESULT CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
